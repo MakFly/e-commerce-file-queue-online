@@ -1,0 +1,27 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # Redis Service
+    App\Service\RedisService:
+        arguments:
+            $redisUrl: '%env(REDIS_URL)%'
+
+    # Queue Service
+    App\Service\QueueService:
+        arguments:
+            $maxConcurrentUsers: '%env(int:QUEUE_MAX_CONCURRENT_USERS)%'
+            $queueEnabled: '%env(bool:QUEUE_ENABLED)%'
+
+    # Controllers
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']

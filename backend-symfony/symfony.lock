@@ -1,0 +1,26 @@
+{
+    "api-platform/core": {
+        "version": "3.2"
+    },
+    "doctrine/doctrine-bundle": {
+        "version": "2.11"
+    },
+    "doctrine/orm": {
+        "version": "2.17"
+    },
+    "lexik/jwt-authentication-bundle": {
+        "version": "2.20"
+    },
+    "nelmio/cors-bundle": {
+        "version": "2.4"
+    },
+    "predis/predis": {
+        "version": "2.2"
+    },
+    "symfony/framework-bundle": {
+        "version": "7.0"
+    },
+    "symfony/security-bundle": {
+        "version": "7.0"
+    }
+}
