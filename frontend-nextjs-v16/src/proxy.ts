@@ -1,10 +1,10 @@
 /**
- * Next.js Middleware for Route Protection
+ * Next.js Proxy for Route Protection
  *
- * WARNING: Middleware should NOT be the only security layer
+ * WARNING: Proxy should NOT be the only security layer
  * Always verify authentication in the DAL (Data Access Layer) as well
  *
- * Middleware is useful for:
+ * Proxy is useful for:
  * - Initial validation (redirect to login if no session)
  * - Redirecting authenticated users away from public routes
  * - Setting headers

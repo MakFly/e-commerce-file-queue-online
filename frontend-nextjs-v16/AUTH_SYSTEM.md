@@ -72,7 +72,7 @@ frontend/src/
 │   │   └── auth/
 │   │       └── user/
 │   │           └── route.ts             # GET /api/auth/user
-│   └── middleware.ts                    # Middleware Next.js
+│   └── proxy.ts                    # Proxy Next.js
 ├── hooks/
 │   └── useAuth.ts                       # Hooks React pour auth
 └── components/
@@ -253,7 +253,7 @@ Le middleware :
 - ❌ N'EST PAS suffisant seul (toujours vérifier dans le DAL)
 
 ```typescript
-// middleware.ts
+// proxy.ts
 const PROTECTED_ROUTES = ['/dashboard', '/profile', '/orders'];
 const ADMIN_ROUTES = ['/admin'];
 const AUTH_ROUTES = ['/login', '/register'];
@@ -599,7 +599,7 @@ describe('Authentication', () => {
 
 **Debug** :
 ```typescript
-// Dans middleware.ts
+// Dans proxy.ts
 console.log('Session:', session);
 console.log('Is authenticated:', isAuthenticated);
 console.log('Token expired:', isTokenExpired);

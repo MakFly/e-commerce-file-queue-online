@@ -113,7 +113,7 @@ frontend-nextjs-v16/
 │   ├── lib/                    # Utilities
 │   ├── hooks/                  # Custom hooks
 │   ├── types/                  # TypeScript types
-│   └── middleware.ts           # Next.js middleware
+│   └── proxy.ts           # Next.js proxy
 ├── public/                     # Static assets
 └── next.config.js              # Next.js configuration
 ```

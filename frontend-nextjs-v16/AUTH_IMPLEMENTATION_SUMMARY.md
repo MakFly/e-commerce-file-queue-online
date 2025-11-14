@@ -52,7 +52,7 @@ Couche de sécurité principale :
 - ✅ `refreshAccessToken()` - Rafraîchir l'access token
 - ✅ `checkAndRefreshToken()` - Vérifier et rafraîchir si nécessaire
 
-### 6. **Middleware Next.js** (`middleware.ts`)
+### 6. **Proxy Next.js** (`proxy.ts`)
 - ✅ Protection des routes `/dashboard`, `/profile`, `/orders`
 - ✅ Routes admin `/admin`
 - ✅ Redirection users auth de `/login` vers `/dashboard`
@@ -113,7 +113,7 @@ Frontend
 ├── Server Actions (/app/actions/auth.ts)
 │   └── login, logout, register, refresh
 │
-├── Middleware (/middleware.ts)
+├── Middleware (/proxy.ts)
 │   └── Validation initiale des routes
 │
 ├── Client Layer
