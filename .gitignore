@@ -23,6 +23,16 @@
 /frontend-nextjs-v16/.DS_Store
 /frontend-nextjs-v16/*.log
 
+# TanStack Start frontend
+/frontend-tanstack-start/node_modules/
+/frontend-tanstack-start/.vinxi/
+/frontend-tanstack-start/.output/
+/frontend-tanstack-start/dist/
+/frontend-tanstack-start/build/
+/frontend-tanstack-start/.env*.local
+/frontend-tanstack-start/.DS_Store
+/frontend-tanstack-start/*.log
+
 # Docker
 .docker-data/
 
