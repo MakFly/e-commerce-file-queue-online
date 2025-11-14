@@ -258,8 +258,8 @@ curl http://localhost:8000/api/queue/stats
 
 ```bash
 # Chercher les imports axios restants
-grep -r "from 'axios'" frontend/src/
-grep -r 'from "axios"' frontend/src/
+grep -r "from 'axios'" frontend-nextjs-v16/src/
+grep -r 'from "axios"' frontend-nextjs-v16/src/
 ```
 
 Si vous trouvez des imports, remplacez-les par le nouveau API client :

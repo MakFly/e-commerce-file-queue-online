@@ -13,15 +13,15 @@
 /backend/storage/*.key
 /backend/.phpunit.cache
 
-# Next.js frontend
-/frontend/node_modules/
-/frontend/.next/
-/frontend/out/
-/frontend/build
-/frontend/.env*.local
-/frontend/.vercel
-/frontend/.DS_Store
-/frontend/*.log
+# Next.js v16 frontend
+/frontend-nextjs-v16/node_modules/
+/frontend-nextjs-v16/.next/
+/frontend-nextjs-v16/out/
+/frontend-nextjs-v16/build
+/frontend-nextjs-v16/.env*.local
+/frontend-nextjs-v16/.vercel
+/frontend-nextjs-v16/.DS_Store
+/frontend-nextjs-v16/*.log
 
 # Docker
 .docker-data/

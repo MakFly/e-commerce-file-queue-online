@@ -10,7 +10,7 @@ Ce document explique la migration du backend Laravel vers Symfony avec API Platf
 
 ```
 e-commerce-file-queue-online/
-├── frontend/                    # Next.js 16 + React 19
+├── frontend-nextjs-v16/        # Next.js 16 + React 19
 ├── backend-laravel/            # Laravel 10 (Port 8000)
 └── backend-symfony/            # Symfony 7 (Port 8001) ← NOUVEAU
 ```
@@ -408,7 +408,7 @@ server {
 ### Méthode 3 : Feature Flag
 
 ```typescript
-// frontend/src/lib/constants.ts
+// frontend-nextjs-v16/src/lib/constants.ts
 export const API_BASE_URL = process.env.NEXT_PUBLIC_USE_SYMFONY === 'true'
   ? 'http://localhost:8001'
   : 'http://localhost:8000';

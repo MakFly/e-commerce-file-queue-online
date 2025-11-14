@@ -94,7 +94,7 @@ e-commerce-file-queue-online/
 │   │   └── web.php
 │   └── Dockerfile
 │
-├── frontend/                   # Application Next.js
+├── frontend-nextjs-v16/        # Application Next.js v16
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── page.tsx
@@ -384,7 +384,7 @@ Les volumes Docker sont configurés pour le hot-reload :
 
 ### Le frontend ne se connecte pas au backend
 
-Vérifiez la configuration CORS dans `backend/config/cors.php` et l'URL dans `frontend/.env.local`.
+Vérifiez la configuration CORS dans `backend/config/cors.php` et l'URL dans `frontend-nextjs-v16/.env.local`.
 
 ### Les sessions expirent trop vite
 

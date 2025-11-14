@@ -317,10 +317,10 @@ const middleware = [
 
 ## 📚 Ressources
 
-- **Code** : `/frontend/src/app/admin/page.tsx`
-- **Composants** : `/frontend/src/components/admin/`
+- **Code** : `/frontend-nextjs-v16/src/app/admin/page.tsx`
+- **Composants** : `/frontend-nextjs-v16/src/components/admin/`
 - **API** : `/backend/app/Http/Controllers/AdminController.php`
-- **Types** : `/frontend/src/lib/api.ts`
+- **Types** : `/frontend-nextjs-v16/src/lib/api.ts`
 
 ---
 

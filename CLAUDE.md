@@ -313,7 +313,7 @@ backend/
 ### Frontend Next.js
 
 ```
-frontend/
+frontend-nextjs-v16/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx                      # Layout principal

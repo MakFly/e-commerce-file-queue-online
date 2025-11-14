@@ -191,7 +191,7 @@ Tous les utilisateurs seront en file d'attente ! 😄
    ipconfig
    ```
 
-2. Modifiez `frontend/.env.local` :
+2. Modifiez `frontend-nextjs-v16/.env.local` :
    ```env
    NEXT_PUBLIC_API_URL=http://192.168.1.X:8000
    ```

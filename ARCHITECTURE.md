@@ -32,9 +32,9 @@ Cette documentation décrit l'architecture moderne mise en place pour le fronten
 ## 🗂️ Structure du Projet
 
 ```
-frontend/
+frontend-nextjs-v16/
 ├── src/
-│   ├── app/                          # App Router (Next.js 14)
+│   ├── app/                          # App Router (Next.js 16)
 │   │   ├── actions/                  # Server Actions
 │   │   │   ├── order.ts             # Order mutations
 │   │   │   └── product.ts           # Product actions
