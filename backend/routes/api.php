@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QueueController;
+use App\Http\Controllers\AdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,4 +43,15 @@ Route::middleware(['queue.check'])->group(function () {
 // Health check
 Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
+});
+
+// Admin routes
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard']);
+    Route::get('/stats', [AdminController::class, 'stats']);
+    Route::get('/history', [AdminController::class, 'history']);
+    Route::post('/kick-user', [AdminController::class, 'kickUser']);
+    Route::post('/clear-queue', [AdminController::class, 'clearQueue']);
+    Route::post('/update-config', [AdminController::class, 'updateConfig']);
+    Route::get('/redis-info', [AdminController::class, 'redisInfo']);
 });
