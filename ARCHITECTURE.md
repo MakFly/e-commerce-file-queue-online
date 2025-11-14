@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Cette documentation décrit l'architecture moderne mise en place pour le frontend Next.js 14, utilisant les meilleures pratiques recommandées par Vercel et la communauté React.
+Cette documentation décrit l'architecture moderne mise en place pour le frontend **Next.js 16**, utilisant les toutes dernières fonctionnalités et meilleures pratiques recommandées par Vercel et la communauté React.
 
 ---
 
@@ -10,15 +10,22 @@ Cette documentation décrit l'architecture moderne mise en place pour le fronten
 
 | Technologie | Version | Rôle |
 |-------------|---------|------|
-| **Next.js** | 14.0.4 | Framework React avec App Router |
-| **React** | 18.2.0 | Librairie UI |
-| **TypeScript** | 5.3.3 | Typage statique |
-| **TanStack Query** | 5.17.0 | Data fetching et cache management |
-| **React Hook Form** | 7.49.2 | Gestion des formulaires |
-| **Zod** | 3.22.4 | Validation de schémas |
-| **Axios** | 1.6.2 | Client HTTP |
-| **Sonner** | 1.3.1 | Toast notifications |
+| **Next.js** | 16.0.0 | Framework React avec App Router & Turbopack |
+| **React** | 19.0.0 | Librairie UI avec React Compiler |
+| **TypeScript** | 5.7.2 | Typage statique |
+| **TanStack Query** | 5.62.0 | Data fetching et cache management |
+| **React Hook Form** | 7.54.0 | Gestion des formulaires |
+| **Zod** | 3.24.1 | Validation de schémas |
+| **Native Fetch API** | Built-in | HTTP client (NO external libraries) |
+| **Sonner** | 1.7.0 | Toast notifications |
 | **shadcn/ui** | Latest | Composants UI |
+
+### 🚀 Nouveautés Next.js 16
+
+- **Turbopack Stable** : Bundler par défaut avec Fast Refresh 5-10x plus rapide
+- **React 19 Support** : React Compiler intégré pour optimisation automatique
+- **Cache Components** : Nouveau modèle de programmation avec Partial Pre-Rendering (PPR)
+- **Native Fetch** : Utilisation exclusive de l'API fetch native (pas de dépendances externes)
 
 ---
 
