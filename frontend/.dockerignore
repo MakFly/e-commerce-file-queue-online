@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+build/
+.env*.local
+.vercel
+.DS_Store
+*.log
+.git
+.gitignore
+README.md
