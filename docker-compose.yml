@@ -36,17 +36,17 @@ services:
       timeout: 3s
       retries: 5
 
-  # Laravel Backend
-  backend:
+  # Laravel Backend (Port 8000)
+  backend-laravel:
     build:
-      context: ./backend
+      context: ./backend-laravel
       dockerfile: Dockerfile
-    container_name: ecommerce_backend
+    container_name: ecommerce_backend_laravel
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/var/www/html
-      - backend_vendor:/var/www/html/vendor
+      - ./backend-laravel:/var/www/html
+      - backend_laravel_vendor:/var/www/html/vendor
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
@@ -72,14 +72,14 @@ services:
     command: php artisan serve --host=0.0.0.0 --port=8000
 
   # Laravel Queue Worker
-  queue_worker:
+  queue_worker_laravel:
     build:
-      context: ./backend
+      context: ./backend-laravel
       dockerfile: Dockerfile
-    container_name: ecommerce_queue_worker
+    container_name: ecommerce_queue_worker_laravel
     volumes:
-      - ./backend:/var/www/html
-      - backend_vendor:/var/www/html/vendor
+      - ./backend-laravel:/var/www/html
+      - backend_laravel_vendor:/var/www/html/vendor
     environment:
       - APP_ENV=local
       - DB_CONNECTION=mysql
@@ -100,6 +100,33 @@ services:
       - ecommerce_network
     command: php artisan queue:work --verbose --tries=3 --timeout=90
 
+  # Symfony Backend (Port 8001)
+  backend-symfony:
+    build:
+      context: ./backend-symfony
+      dockerfile: Dockerfile
+    container_name: ecommerce_backend_symfony
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./backend-symfony:/app
+      - backend_symfony_vendor:/app/vendor
+    environment:
+      - APP_ENV=dev
+      - APP_DEBUG=1
+      - DATABASE_URL=mysql://root:secret@mysql:3306/ecommerce?serverVersion=8.0
+      - REDIS_URL=redis://redis:6379
+      - FRONTEND_URL=http://localhost:3000
+      - CORS_ALLOW_ORIGIN=^http://localhost:3000$
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ecommerce_network
+    command: symfony server:start --port=8001 --no-tls
+
   # Next.js Frontend
   frontend:
     build:
@@ -116,7 +143,7 @@ services:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
-      - backend
+      - backend-laravel
     networks:
       - ecommerce_network
     command: npm run dev
@@ -128,5 +155,6 @@ networks:
 volumes:
   mysql_data:
   redis_data:
-  backend_vendor:
+  backend_laravel_vendor:
+  backend_symfony_vendor:
   frontend_node_modules:
