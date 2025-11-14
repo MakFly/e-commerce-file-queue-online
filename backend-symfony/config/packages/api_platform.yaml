@@ -25,15 +25,11 @@ api_platform:
         extra_properties:
             standard_put: true
             rfc_7807_compliant_errors: true
-
-    # Pagination
-    collection:
-        pagination:
-            enabled: true
-            client_enabled: true
-            client_items_per_page: true
-            items_per_page: 30
-            maximum_items_per_page: 100
+        pagination_enabled: true
+        pagination_client_enabled: true
+        pagination_client_items_per_page: true
+        pagination_items_per_page: 30
+        pagination_maximum_items_per_page: 100
 
     # Exception to status codes
     exception_to_status:

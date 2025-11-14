@@ -6,14 +6,17 @@ framework:
         log: true
 
     cache:
-        app: cache.adapter.redis
-        default_redis_provider: '%env(REDIS_URL)%'
+        app: cache.adapter.filesystem
+        # Use Redis cache in production by uncommenting:
+        # app: cache.adapter.redis
+        # default_redis_provider: '%env(REDIS_URL)%'
 
-    session:
-        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
-        cookie_secure: auto
-        cookie_samesite: lax
-        storage_factory_id: session.storage.factory.native
+    # Session is disabled for stateless API (using JWT)
+    # Uncomment if you need session support
+    # session:
+    #     handler_id: null
+    #     cookie_secure: auto
+    #     cookie_samesite: lax
 
     # Enable trusted hosts
     trusted_hosts: ~
