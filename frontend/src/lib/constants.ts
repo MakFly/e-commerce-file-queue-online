@@ -7,6 +7,13 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export const API_ENDPOINTS = {
+  // Auth
+  AUTH_LOGIN: '/api/auth/login',
+  AUTH_REGISTER: '/api/auth/register',
+  AUTH_LOGOUT: '/api/auth/logout',
+  AUTH_REFRESH: '/api/auth/refresh',
+  AUTH_ME: '/api/auth/me',
+
   // Queue
   QUEUE_STATUS: '/api/queue/status',
   QUEUE_HEARTBEAT: '/api/queue/heartbeat',

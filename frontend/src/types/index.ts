@@ -50,3 +50,16 @@ export type {
   SystemStatus,
   AdminUserStatus,
 } from './admin';
+
+// Auth types
+export type {
+  User,
+  SessionData,
+  LoginCredentials,
+  RegisterData,
+  AuthTokens,
+  AuthResponse,
+  RefreshTokenResponse,
+  AuthState,
+  JWTPayload,
+} from './auth';
