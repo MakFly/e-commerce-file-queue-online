@@ -25,3 +25,10 @@ services:
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
+
+    # JWT Event Listener - Add refresh token to login response
+    App\EventListener\JWTCreatedListener:
+        arguments:
+            $ttl: 2592000  # 30 days
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }

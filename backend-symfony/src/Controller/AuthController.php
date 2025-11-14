@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
+use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,7 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 #[Route('/api/auth', name: 'api_auth_')]
 class AuthController extends AbstractController
@@ -21,7 +22,9 @@ class AuthController extends AbstractController
         private EntityManagerInterface $entityManager,
         private UserRepository $userRepository,
         private UserPasswordHasherInterface $passwordHasher,
-        private JWTTokenManagerInterface $jwtManager
+        private JWTTokenManagerInterface $jwtManager,
+        private RefreshTokenGeneratorInterface $refreshTokenGenerator,
+        private RefreshTokenManagerInterface $refreshTokenManager
     ) {}
 
     #[Route('/register', name: 'register', methods: ['POST'])]
@@ -54,9 +57,12 @@ class AuthController extends AbstractController
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        // Generate tokens
+        // Generate access token
         $accessToken = $this->jwtManager->create($user);
-        $refreshToken = $this->generateRefreshToken($user);
+
+        // Generate refresh token (TTL: 30 days = 2592000 seconds)
+        $refreshTokenEntity = $this->refreshTokenGenerator->createForUserWithTtl($user, 2592000);
+        $this->refreshTokenManager->save($refreshTokenEntity);
 
         return $this->json([
             'user' => [
@@ -65,11 +71,9 @@ class AuthController extends AbstractController
                 'name' => $user->getName(),
                 'role' => in_array('ROLE_ADMIN', $user->getRoles()) ? 'admin' : 'user',
             ],
-            'tokens' => [
-                'accessToken' => $accessToken,
-                'refreshToken' => $refreshToken,
-                'expiresIn' => 3600, // 1 hour
-            ],
+            'token' => $accessToken,
+            'refresh_token' => $refreshTokenEntity->getRefreshToken(),
+            'refresh_token_expiration' => $refreshTokenEntity->getValid()->getTimestamp(),
         ], Response::HTTP_CREATED);
     }
 
@@ -92,53 +96,22 @@ class AuthController extends AbstractController
         ]);
     }
 
-    #[Route('/refresh', name: 'refresh', methods: ['POST'])]
-    public function refresh(Request $request): JsonResponse
+    #[Route('/logout', name: 'logout', methods: ['POST'])]
+    public function logout(Request $request): JsonResponse
     {
+        // Get refresh token from request to revoke it
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['refreshToken'])) {
-            return $this->json([
-                'message' => 'Missing refresh token'
-            ], Response::HTTP_BAD_REQUEST);
+        if (isset($data['refresh_token'])) {
+            $refreshToken = $this->refreshTokenManager->get($data['refresh_token']);
+
+            if ($refreshToken) {
+                $this->refreshTokenManager->delete($refreshToken);
+            }
         }
 
-        // In a real app, you'd validate the refresh token here
-        // For now, we'll just generate a new access token
-        // You should implement proper refresh token validation
-
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->json([
-                'message' => 'Invalid refresh token'
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        $accessToken = $this->jwtManager->create($user);
-
-        return $this->json([
-            'accessToken' => $accessToken,
-            'expiresIn' => 3600,
-        ]);
-    }
-
-    #[Route('/logout', name: 'logout', methods: ['POST'])]
-    public function logout(): JsonResponse
-    {
-        // In a stateless JWT system, logout is handled client-side by removing the token
-        // You could implement token blacklisting here if needed
         return $this->json([
             'message' => 'Logged out successfully'
         ]);
-    }
-
-    /**
-     * Generate refresh token (placeholder - implement proper refresh token logic)
-     */
-    private function generateRefreshToken(UserInterface $user): string
-    {
-        // This is a placeholder. In production, implement proper refresh token generation
-        // with database storage and validation
-        return base64_encode(random_bytes(32));
     }
 }

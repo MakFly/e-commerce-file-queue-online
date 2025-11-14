@@ -3,3 +3,8 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+# Gesdinet JWT Refresh Token
+gesdinet_jwt_refresh_token:
+    path: /api/auth/token/refresh
+    controller: gesdinet.jwtrefreshtoken::refresh
