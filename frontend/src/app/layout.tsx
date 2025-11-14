@@ -4,6 +4,8 @@ import './globals.css'
 import AdminButton from '@/components/AdminButton'
 import Navbar from '@/components/Navbar'
 import { CartProvider } from '@/contexts/CartContext'
+import { QueryProvider } from '@/providers/query-provider'
+import { Toaster } from 'sonner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,11 +22,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <CartProvider>
-          <Navbar />
-          {children}
-          <AdminButton />
-        </CartProvider>
+        <QueryProvider>
+          <CartProvider>
+            <Navbar />
+            {children}
+            <AdminButton />
+            <Toaster position="top-right" richColors />
+          </CartProvider>
+        </QueryProvider>
       </body>
     </html>
   )
