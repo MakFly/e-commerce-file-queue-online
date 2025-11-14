@@ -21,7 +21,12 @@ import type {
   PaymentData,
 } from '@/types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { API_BASE_URL } from './constants';
+import {
+  buildUrl as buildUrlHelper,
+  handleFetchResponse,
+  createHeaders,
+} from './helpers';
 
 // Re-export types for backward compatibility
 export type {
@@ -46,41 +51,25 @@ async function fetchWrapper<T>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const headers = createHeaders(
+    options.headers?.['X-Session-Id'] as string | undefined,
+    options.headers
+  );
+
   const response = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
     cache: 'no-store',
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({
-      message: `HTTP error! status: ${response.status}`,
-    }));
-    throw new Error(error.message || `Request failed with status ${response.status}`);
-  }
-
-  return response.json();
+  return handleFetchResponse<T>(response);
 }
 
 /**
  * Helper to build URL with query params
  */
 function buildUrl(path: string, params?: Record<string, any>): string {
-  const url = `${API_URL}${path}`;
-  if (!params) return url;
-
-  const searchParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      searchParams.append(key, String(value));
-    }
-  });
-
-  const queryString = searchParams.toString();
-  return queryString ? `${url}?${queryString}` : url;
+  return buildUrlHelper(API_BASE_URL, path, params);
 }
 
 // ==================== Queue API ====================
@@ -97,7 +86,7 @@ export const queueApi = {
 
   sendHeartbeat: async (sessionId: string) => {
     return fetchWrapper(
-      `${API_URL}/api/queue/heartbeat`,
+      buildUrl('/api/queue/heartbeat'),
       {
         method: 'POST',
         headers: { 'X-Session-Id': sessionId },
@@ -108,7 +97,7 @@ export const queueApi = {
 
   release: async (sessionId: string) => {
     return fetchWrapper(
-      `${API_URL}/api/queue/release`,
+      buildUrl('/api/queue/release'),
       {
         method: 'POST',
         headers: { 'X-Session-Id': sessionId },
@@ -118,7 +107,7 @@ export const queueApi = {
   },
 
   getStats: async () => {
-    return fetchWrapper(`${API_URL}/api/queue/stats`);
+    return fetchWrapper(buildUrl('/api/queue/stats'));
   },
 };
 
@@ -127,7 +116,7 @@ export const queueApi = {
 export const productApi = {
   getProducts: async (sessionId: string) => {
     return fetchWrapper(
-      `${API_URL}/api/products`,
+      buildUrl('/api/products'),
       {
         headers: { 'X-Session-Id': sessionId },
       }
@@ -139,11 +128,11 @@ export const productApi = {
 
 export const adminApi = {
   getDashboard: async (): Promise<AdminDashboard> => {
-    return fetchWrapper<AdminDashboard>(`${API_URL}/api/admin/dashboard`);
+    return fetchWrapper<AdminDashboard>(buildUrl('/api/admin/dashboard'));
   },
 
   getStats: async (): Promise<AdminStats> => {
-    return fetchWrapper<AdminStats>(`${API_URL}/api/admin/stats`);
+    return fetchWrapper<AdminStats>(buildUrl('/api/admin/stats'));
   },
 
   getHistory: async (minutes: number = 60): Promise<HistoryData[]> => {
@@ -154,7 +143,7 @@ export const adminApi = {
 
   kickUser: async (sessionId: string) => {
     return fetchWrapper(
-      `${API_URL}/api/admin/kick-user`,
+      buildUrl('/api/admin/kick-user'),
       {
         method: 'POST',
         body: JSON.stringify({ session_id: sessionId }),
@@ -164,7 +153,7 @@ export const adminApi = {
 
   clearQueue: async () => {
     return fetchWrapper(
-      `${API_URL}/api/admin/clear-queue`,
+      buildUrl('/api/admin/clear-queue'),
       {
         method: 'POST',
       }
@@ -173,7 +162,7 @@ export const adminApi = {
 
   updateConfig: async (config: { max_concurrent_users?: number; queue_enabled?: boolean }) => {
     return fetchWrapper(
-      `${API_URL}/api/admin/update-config`,
+      buildUrl('/api/admin/update-config'),
       {
         method: 'POST',
         body: JSON.stringify(config),
@@ -182,7 +171,7 @@ export const adminApi = {
   },
 
   getRedisInfo: async (): Promise<RedisInfo> => {
-    return fetchWrapper<RedisInfo>(`${API_URL}/api/admin/redis-info`);
+    return fetchWrapper<RedisInfo>(buildUrl('/api/admin/redis-info'));
   },
 };
 
@@ -209,7 +198,7 @@ export const ecommerceApi = {
 
   getProduct: async (id: number, sessionId?: string): Promise<Product> => {
     return fetchWrapper<Product>(
-      `${API_URL}/api/products/${id}`,
+      buildUrl(`/api/products/${id}`),
       {
         headers: sessionId ? { 'X-Session-Id': sessionId } : {},
       }
@@ -218,7 +207,7 @@ export const ecommerceApi = {
 
   getCategories: async (sessionId?: string): Promise<string[]> => {
     return fetchWrapper<string[]>(
-      `${API_URL}/api/categories`,
+      buildUrl('/api/categories'),
       {
         headers: sessionId ? { 'X-Session-Id': sessionId } : {},
       }
@@ -230,7 +219,7 @@ export const ecommerceApi = {
     sessionId?: string
   ) => {
     return fetchWrapper(
-      `${API_URL}/api/products/check-stock`,
+      buildUrl('/api/products/check-stock'),
       {
         method: 'POST',
         headers: sessionId ? { 'X-Session-Id': sessionId } : {},
@@ -245,7 +234,7 @@ export const ecommerceApi = {
     sessionId: string
   ): Promise<{ success: boolean; message: string; order: Order }> => {
     return fetchWrapper<{ success: boolean; message: string; order: Order }>(
-      `${API_URL}/api/orders`,
+      buildUrl('/api/orders'),
       {
         method: 'POST',
         headers: { 'X-Session-Id': sessionId },
@@ -256,7 +245,7 @@ export const ecommerceApi = {
 
   getOrder: async (id: number, sessionId: string): Promise<Order> => {
     return fetchWrapper<Order>(
-      `${API_URL}/api/orders/${id}`,
+      buildUrl(`/api/orders/${id}`),
       {
         headers: { 'X-Session-Id': sessionId },
       }
@@ -265,7 +254,7 @@ export const ecommerceApi = {
 
   getOrderByNumber: async (orderNumber: string, sessionId: string): Promise<Order> => {
     return fetchWrapper<Order>(
-      `${API_URL}/api/orders/number/${orderNumber}`,
+      buildUrl(`/api/orders/number/${orderNumber}`),
       {
         headers: { 'X-Session-Id': sessionId },
       }
@@ -274,7 +263,7 @@ export const ecommerceApi = {
 
   processPayment: async (orderId: number, paymentData: PaymentData, sessionId: string) => {
     return fetchWrapper(
-      `${API_URL}/api/orders/${orderId}/payment`,
+      buildUrl(`/api/orders/${orderId}/payment`),
       {
         method: 'POST',
         headers: { 'X-Session-Id': sessionId },
@@ -285,7 +274,7 @@ export const ecommerceApi = {
 
   getUserOrders: async (sessionId: string): Promise<{ orders: Order[]; total: number }> => {
     return fetchWrapper<{ orders: Order[]; total: number }>(
-      `${API_URL}/api/my-orders`,
+      buildUrl('/api/my-orders'),
       {
         headers: { 'X-Session-Id': sessionId },
       }
@@ -307,7 +296,7 @@ export const api = {
   },
 
   post: async <T>(url: string, data?: any, config?: { headers?: any }): Promise<{ data: T }> => {
-    const responseData = await fetchWrapper<T>(`${API_URL}${url}`, {
+    const responseData = await fetchWrapper<T>(buildUrl(url), {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
       headers: config?.headers,

@@ -5,6 +5,7 @@
  */
 
 import { QueryClient, DefaultOptions } from '@tanstack/react-query';
+import { QUERY_CACHE_CONFIG } from './constants';
 
 const queryConfig: DefaultOptions = {
   queries: {
@@ -12,16 +13,16 @@ const queryConfig: DefaultOptions = {
     refetchOnWindowFocus: false,
     // Don't refetch on mount if data is fresh
     refetchOnMount: false,
-    // Retry failed requests 1 time
-    retry: 1,
+    // Retry failed requests
+    retry: QUERY_CACHE_CONFIG.RETRY_COUNT,
     // Stale time: 5 minutes
-    staleTime: 5 * 60 * 1000,
+    staleTime: QUERY_CACHE_CONFIG.STALE_TIME,
     // Cache time: 10 minutes
-    gcTime: 10 * 60 * 1000,
+    gcTime: QUERY_CACHE_CONFIG.GC_TIME,
   },
   mutations: {
     // Retry failed mutations 0 times
-    retry: 0,
+    retry: QUERY_CACHE_CONFIG.MUTATION_RETRY_COUNT,
   },
 };
 

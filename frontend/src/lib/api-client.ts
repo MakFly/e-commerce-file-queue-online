@@ -16,7 +16,15 @@ import type {
   QueueStats,
 } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { API_BASE_URL } from './constants';
+import {
+  getSessionId,
+  buildUrl,
+  fetchApi as fetchHelper,
+  handleApiError as handleError,
+  get,
+  post,
+} from './helpers';
 
 // Re-export types for backward compatibility
 export type {
@@ -29,124 +37,8 @@ export type {
   QueueStats,
 };
 
-/**
- * Get session ID from localStorage (client-side only)
- */
-function getSessionId(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('session_id');
-}
-
-/**
- * Create fetch options with default configuration
- */
-function createFetchOptions(
-  method: string = 'GET',
-  sessionId?: string,
-  body?: any
-): RequestInit {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
-
-  if (sessionId) {
-    headers['X-Session-Id'] = sessionId;
-  }
-
-  const options: RequestInit = {
-    method,
-    headers,
-    // Next.js 16: Use cache options for better performance
-    cache: method === 'GET' ? 'no-store' : undefined,
-  };
-
-  if (body && method !== 'GET') {
-    options.body = JSON.stringify(body);
-  }
-
-  return options;
-}
-
-/**
- * Handle fetch response and errors
- */
-async function handleResponse<T>(response: Response): Promise<T> {
-  // Check if response is ok (status 200-299)
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({
-      message: `HTTP error! status: ${response.status}`,
-    }));
-
-    throw {
-      message: errorData.message || `Request failed with status ${response.status}`,
-      status: response.status,
-      errors: errorData.errors,
-    } as ApiError;
-  }
-
-  // Parse JSON response
-  return response.json();
-}
-
-/**
- * Handle API errors consistently
- */
-export function handleApiError(error: unknown): ApiError {
-  if (error && typeof error === 'object' && 'message' in error) {
-    return error as ApiError;
-  }
-
-  if (error instanceof Error) {
-    return {
-      message: error.message,
-    };
-  }
-
-  return {
-    message: 'An unknown error occurred',
-  };
-}
-
-/**
- * Make a fetch request with automatic session ID injection
- */
-async function fetchApi<T>(
-  endpoint: string,
-  options: {
-    method?: string;
-    sessionId?: string;
-    body?: any;
-    params?: Record<string, string | number | undefined>;
-  } = {}
-): Promise<T> {
-  const { method = 'GET', sessionId, body, params } = options;
-
-  // Auto-inject session ID if not provided (client-side only)
-  const sid = sessionId || getSessionId() || undefined;
-
-  // Build URL with query params
-  let url = `${API_BASE_URL}${endpoint}`;
-  if (params) {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) {
-        searchParams.append(key, String(value));
-      }
-    });
-    const queryString = searchParams.toString();
-    if (queryString) {
-      url += `?${queryString}`;
-    }
-  }
-
-  // Make fetch request
-  const fetchOptions = createFetchOptions(method, sid, body);
-  const response = await fetch(url, fetchOptions);
-
-  // Handle response
-  return handleResponse<T>(response);
-}
+// Re-export helper functions
+export { handleApiError: handleError } from './helpers';
 
 /**
  * API Client Class
@@ -155,30 +47,36 @@ class ApiClient {
   // ==================== Queue API ====================
 
   async getQueueStatus(sessionId: string): Promise<QueueStatus> {
-    return fetchApi('/api/queue/status', {
-      sessionId,
-      params: { session_id: sessionId },
-    });
+    return get<QueueStatus>(
+      API_BASE_URL,
+      '/api/queue/status',
+      {
+        sessionId,
+        params: { session_id: sessionId },
+      }
+    );
   }
 
   async sendHeartbeat(sessionId: string): Promise<{ status: string }> {
-    return fetchApi('/api/queue/heartbeat', {
-      method: 'POST',
-      sessionId,
-      body: { session_id: sessionId },
-    });
+    return post<{ status: string }>(
+      API_BASE_URL,
+      '/api/queue/heartbeat',
+      { session_id: sessionId },
+      { sessionId }
+    );
   }
 
   async releaseSession(sessionId: string): Promise<{ status: string }> {
-    return fetchApi('/api/queue/release', {
-      method: 'POST',
-      sessionId,
-      body: { session_id: sessionId },
-    });
+    return post<{ status: string }>(
+      API_BASE_URL,
+      '/api/queue/release',
+      { session_id: sessionId },
+      { sessionId }
+    );
   }
 
   async getQueueStats(): Promise<QueueStats> {
-    return fetchApi('/api/queue/stats');
+    return get<QueueStats>(API_BASE_URL, '/api/queue/stats');
   }
 
   // ==================== Products API ====================
@@ -187,67 +85,81 @@ class ApiClient {
     category?: string;
     sessionId?: string;
   }): Promise<{ products: Product[] }> {
-    return fetchApi('/api/products', {
-      sessionId: params?.sessionId,
-      params: params?.category ? { category: params.category } : undefined,
-    });
+    return get<{ products: Product[] }>(
+      API_BASE_URL,
+      '/api/products',
+      {
+        sessionId: params?.sessionId,
+        params: params?.category ? { category: params.category } : undefined,
+      }
+    );
   }
 
   async getProduct(id: number, sessionId?: string): Promise<{ product: Product }> {
-    return fetchApi(`/api/products/${id}`, {
-      sessionId,
-    });
+    return get<{ product: Product }>(
+      API_BASE_URL,
+      `/api/products/${id}`,
+      { sessionId }
+    );
   }
 
   // ==================== Orders API ====================
 
   async createOrder(data: CreateOrderData, sessionId?: string): Promise<{ order: Order }> {
-    return fetchApi('/api/orders', {
-      method: 'POST',
-      sessionId,
-      body: data,
-    });
+    return post<{ order: Order }>(
+      API_BASE_URL,
+      '/api/orders',
+      data,
+      { sessionId }
+    );
   }
 
   async getOrders(sessionId?: string): Promise<{ orders: Order[] }> {
-    return fetchApi('/api/orders', {
-      sessionId,
-    });
+    return get<{ orders: Order[] }>(
+      API_BASE_URL,
+      '/api/orders',
+      { sessionId }
+    );
   }
 
   async getOrder(id: number, sessionId?: string): Promise<{ order: Order }> {
-    return fetchApi(`/api/orders/${id}`, {
-      sessionId,
-    });
+    return get<{ order: Order }>(
+      API_BASE_URL,
+      `/api/orders/${id}`,
+      { sessionId }
+    );
   }
 
   // ==================== Admin API ====================
 
   async getAdminDashboard(): Promise<any> {
-    return fetchApi('/api/admin/dashboard');
+    return get<any>(API_BASE_URL, '/api/admin/dashboard');
   }
 
   async kickUser(sessionId: string): Promise<{ message: string }> {
-    return fetchApi('/api/admin/kick-user', {
-      method: 'POST',
-      body: { session_id: sessionId },
-    });
+    return post<{ message: string }>(
+      API_BASE_URL,
+      '/api/admin/kick-user',
+      { session_id: sessionId }
+    );
   }
 
   async clearQueue(): Promise<{ message: string }> {
-    return fetchApi('/api/admin/clear-queue', {
-      method: 'POST',
-    });
+    return post<{ message: string }>(
+      API_BASE_URL,
+      '/api/admin/clear-queue'
+    );
   }
 
   async updateQueueConfig(config: {
     max_concurrent_users?: number;
     queue_enabled?: boolean;
   }): Promise<{ message: string; config: any }> {
-    return fetchApi('/api/admin/update-config', {
-      method: 'POST',
-      body: config,
-    });
+    return post<{ message: string; config: any }>(
+      API_BASE_URL,
+      '/api/admin/update-config',
+      config
+    );
   }
 }
 
@@ -269,62 +181,12 @@ export async function serverFetch<T>(
     method?: string;
     sessionId?: string;
     body?: any;
-    params?: Record<string, string | number | undefined>;
+    params?: Record<string, string | number | boolean | undefined | null>;
     // Next.js 16 cache options
     cache?: RequestCache;
     revalidate?: number | false;
     tags?: string[];
   } = {}
 ): Promise<T> {
-  const { method = 'GET', sessionId, body, params, cache, revalidate, tags } = options;
-
-  // Build URL with query params
-  let url = `${API_BASE_URL}${endpoint}`;
-  if (params) {
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) {
-        searchParams.append(key, String(value));
-      }
-    });
-    const queryString = searchParams.toString();
-    if (queryString) {
-      url += `?${queryString}`;
-    }
-  }
-
-  // Create fetch options
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
-
-  if (sessionId) {
-    headers['X-Session-Id'] = sessionId;
-  }
-
-  const fetchOptions: RequestInit = {
-    method,
-    headers,
-    cache: cache || (method === 'GET' ? 'no-store' : undefined),
-  };
-
-  // Next.js 16 specific options
-  if (revalidate !== undefined) {
-    (fetchOptions as any).next = { revalidate };
-  }
-
-  if (tags && tags.length > 0) {
-    (fetchOptions as any).next = { ...(fetchOptions as any).next, tags };
-  }
-
-  if (body && method !== 'GET') {
-    fetchOptions.body = JSON.stringify(body);
-  }
-
-  // Make fetch request
-  const response = await fetch(url, fetchOptions);
-
-  // Handle response
-  return handleResponse<T>(response);
+  return fetchHelper<T>(API_BASE_URL, endpoint, options);
 }
