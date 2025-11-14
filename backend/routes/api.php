@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,18 +22,22 @@ Route::prefix('queue')->group(function () {
     Route::post('/cleanup', [QueueController::class, 'cleanup']);
 });
 
-// Protected routes (with queue check)
+// E-commerce routes (protected with queue check)
 Route::middleware(['queue.check'])->group(function () {
-    Route::get('/products', function () {
-        return response()->json([
-            'products' => [
-                ['id' => 1, 'name' => 'Product 1', 'price' => 99.99],
-                ['id' => 2, 'name' => 'Product 2', 'price' => 149.99],
-                ['id' => 3, 'name' => 'Product 3', 'price' => 199.99],
-            ]
-        ]);
-    });
+    // Products
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+    Route::get('/categories', [ProductController::class, 'categories']);
+    Route::post('/products/check-stock', [ProductController::class, 'checkStock']);
 
+    // Orders
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::get('/orders/number/{orderNumber}', [OrderController::class, 'getByOrderNumber']);
+    Route::post('/orders/{id}/payment', [OrderController::class, 'processPayment']);
+    Route::get('/my-orders', [OrderController::class, 'getUserOrders']);
+
+    // User info
     Route::get('/user', function (Request $request) {
         return response()->json([
             'session_id' => $request->header('X-Session-Id'),

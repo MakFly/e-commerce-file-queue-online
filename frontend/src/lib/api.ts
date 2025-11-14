@@ -161,3 +161,151 @@ export const adminApi = {
     return response.data;
   },
 };
+
+// E-commerce API Types
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  image: string | null;
+  category: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export interface OrderItem {
+  id: number;
+  product_id: number;
+  product_name: string;
+  product_price: number;
+  quantity: number;
+  subtotal: number;
+}
+
+export interface Order {
+  id: number;
+  order_number: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  shipping_address: string;
+  shipping_city: string;
+  shipping_postal_code: string;
+  shipping_country: string;
+  subtotal: number;
+  shipping_cost: number;
+  tax: number;
+  total: number;
+  payment_method: string;
+  payment_status: string;
+  order_status: string;
+  notes: string | null;
+  session_id: string | null;
+  items: OrderItem[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateOrderData {
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  shipping_address: string;
+  shipping_city: string;
+  shipping_postal_code: string;
+  shipping_country: string;
+  payment_method: 'credit_card' | 'paypal' | 'bank_transfer';
+  items: { product_id: number; quantity: number }[];
+  notes?: string;
+}
+
+export interface PaymentData {
+  payment_method: string;
+  card_number?: string;
+  card_expiry?: string;
+  card_cvv?: string;
+}
+
+// E-commerce API
+export const ecommerceApi = {
+  // Products
+  getProducts: async (params?: {
+    category?: string;
+    search?: string;
+    sort?: string;
+    order?: 'asc' | 'desc';
+  }, sessionId?: string): Promise<{ products: Product[]; total: number }> => {
+    const response = await api.get('/api/products', {
+      params,
+      headers: sessionId ? { 'X-Session-Id': sessionId } : {},
+    });
+    return response.data;
+  },
+
+  getProduct: async (id: number, sessionId?: string): Promise<Product> => {
+    const response = await api.get(`/api/products/${id}`, {
+      headers: sessionId ? { 'X-Session-Id': sessionId } : {},
+    });
+    return response.data;
+  },
+
+  getCategories: async (sessionId?: string): Promise<string[]> => {
+    const response = await api.get('/api/categories', {
+      headers: sessionId ? { 'X-Session-Id': sessionId } : {},
+    });
+    return response.data;
+  },
+
+  checkStock: async (items: { product_id: number; quantity: number }[], sessionId?: string) => {
+    const response = await api.post(
+      '/api/products/check-stock',
+      { items },
+      { headers: sessionId ? { 'X-Session-Id': sessionId } : {} }
+    );
+    return response.data;
+  },
+
+  // Orders
+  createOrder: async (orderData: CreateOrderData, sessionId: string): Promise<{ success: boolean; message: string; order: Order }> => {
+    const response = await api.post('/api/orders', orderData, {
+      headers: { 'X-Session-Id': sessionId },
+    });
+    return response.data;
+  },
+
+  getOrder: async (id: number, sessionId: string): Promise<Order> => {
+    const response = await api.get(`/api/orders/${id}`, {
+      headers: { 'X-Session-Id': sessionId },
+    });
+    return response.data;
+  },
+
+  getOrderByNumber: async (orderNumber: string, sessionId: string): Promise<Order> => {
+    const response = await api.get(`/api/orders/number/${orderNumber}`, {
+      headers: { 'X-Session-Id': sessionId },
+    });
+    return response.data;
+  },
+
+  processPayment: async (orderId: number, paymentData: PaymentData, sessionId: string) => {
+    const response = await api.post(`/api/orders/${orderId}/payment`, paymentData, {
+      headers: { 'X-Session-Id': sessionId },
+    });
+    return response.data;
+  },
+
+  getUserOrders: async (sessionId: string): Promise<{ orders: Order[]; total: number }> => {
+    const response = await api.get('/api/my-orders', {
+      headers: { 'X-Session-Id': sessionId },
+    });
+    return response.data;
+  },
+};
