@@ -25,6 +25,55 @@ Une application e-commerce complète avec un système de file d'attente intellig
 - Rafraîchissement automatique de la position
 - Design élégant avec Tailwind CSS
 
+## ⚡ Quick Start - Tester la File d'Attente en 30 Secondes
+
+### Option 1 : Script Automatique (Recommandé)
+
+**Linux/Mac :**
+```bash
+./quick-test.sh
+```
+
+**Windows :**
+```bash
+quick-test.bat
+```
+
+Ce script :
+- Configure automatiquement la limite à **1 utilisateur**
+- Démarre tous les services Docker
+- Affiche les instructions de test
+
+### Option 2 : Manuel
+
+```bash
+# 1. Configurer pour les tests
+cp backend/.env.testing backend/.env
+
+# 2. Démarrer Docker
+docker-compose up -d
+
+# 3. Attendre 30 secondes
+sleep 30
+
+# 4. Tester !
+```
+
+### 🧪 Comment Voir la File d'Attente
+
+1. **Navigateur normal** → http://localhost:3000
+   - ✅ Vous verrez les **PRODUITS**
+
+2. **Fenêtre incognito** → http://localhost:3000
+   - 🕒 Vous verrez la **FILE D'ATTENTE** !
+
+3. **Fermez la première fenêtre**
+   - 🎉 La deuxième sera **activée automatiquement** !
+
+**Note :** La configuration de test limite à 1 utilisateur simultané, donc le 2ème utilisateur sera automatiquement en file d'attente.
+
+Pour plus de détails, consultez [TESTING.md](TESTING.md).
+
 ## 📁 Structure du Projet
 
 ```
