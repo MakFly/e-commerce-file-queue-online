@@ -26,6 +26,7 @@ import {
   buildUrl as buildUrlHelper,
   handleFetchResponse,
   createHeaders,
+  fetchWithLogging,
 } from './helpers';
 
 // Re-export types for backward compatibility
@@ -45,24 +46,23 @@ export type {
 };
 
 /**
- * Native fetch wrapper with error handling
+ * Native fetch wrapper with error handling and logging
  */
 async function fetchWrapper<T>(
   url: string,
   options: RequestInit = {}
 ): Promise<T> {
+  const method = (options.method || 'GET').toUpperCase()
+
   const headers = createHeaders(
     options.headers?.['X-Session-Id'] as string | undefined,
     options.headers
   );
 
-  const response = await fetch(url, {
+  return fetchWithLogging<T>(method, url, {
     ...options,
     headers,
-    cache: 'no-store',
   });
-
-  return handleFetchResponse<T>(response);
 }
 
 /**

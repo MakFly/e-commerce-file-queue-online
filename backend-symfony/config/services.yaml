@@ -32,3 +32,8 @@ services:
             $ttl: 2592000  # 30 days
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }
+
+    # API Logger - Inject the 'api' channel
+    App\EventListener\ApiLoggerListener:
+        arguments:
+            $apiLogger: '@monolog.logger.api'

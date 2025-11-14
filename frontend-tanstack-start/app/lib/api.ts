@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './constants'
+import { logApiRequest, logApiResponse, logApiError } from './logger'
 import type {
   User,
   AuthTokens,
@@ -25,6 +26,8 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`
+    const method = (options.method || 'GET').toUpperCase()
+    const startTime = performance.now()
 
     const config: RequestInit = {
       ...options,
@@ -34,22 +37,43 @@ class ApiClient {
       },
     }
 
+    // Log request
+    const requestBody = options.body ? JSON.parse(options.body as string) : undefined
+    logApiRequest(method, url, requestBody)
+
     try {
       const response = await fetch(url, config)
+      const duration = Math.round(performance.now() - startTime)
 
       if (!response.ok) {
         const error: ApiError = await response.json().catch(() => ({
           message: response.statusText,
         }))
+
+        // Log error response
+        logApiResponse(method, url, response.status, duration, error)
+
         throw new Error(error.message || 'API request failed')
       }
 
-      return await response.json()
+      const data = await response.json()
+
+      // Log successful response
+      logApiResponse(method, url, response.status, duration)
+
+      return data
     } catch (error) {
+      const duration = Math.round(performance.now() - startTime)
+
       if (error instanceof Error) {
+        // Log error
+        logApiError(method, url, error, duration)
         throw error
       }
-      throw new Error('Unknown error occurred')
+
+      const unknownError = new Error('Unknown error occurred')
+      logApiError(method, url, unknownError, duration)
+      throw unknownError
     }
   }
 

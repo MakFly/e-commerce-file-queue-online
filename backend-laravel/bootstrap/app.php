@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
 
+        // Add API Logger to all API routes
+        $middleware->api(append: [
+            \App\Http\Middleware\ApiLogger::class,
+        ]);
+
         $middleware->alias([
             'queue.check' => \App\Http\Middleware\QueueMiddleware::class,
         ]);
