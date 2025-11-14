@@ -6,89 +6,28 @@
  * NO external HTTP libraries - pure fetch API
  */
 
+import type {
+  ApiError,
+  Product,
+  Order,
+  OrderItem,
+  CreateOrderData,
+  QueueStatus,
+  QueueStats,
+} from '@/types';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-// Types
-export interface ApiError {
-  message: string;
-  status?: number;
-  errors?: Record<string, string[]>;
-}
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  image_url?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface Order {
-  id: number;
-  order_number: string;
-  customer_name: string;
-  customer_email: string;
-  customer_phone: string;
-  shipping_address: string;
-  shipping_city: string;
-  shipping_postal_code: string;
-  shipping_country: string;
-  payment_method: string;
-  subtotal: number;
-  shipping_cost: number;
-  tax: number;
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  items: OrderItem[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface OrderItem {
-  id: number;
-  product_id: number;
-  product_name: string;
-  quantity: number;
-  price: number;
-}
-
-export interface CreateOrderData {
-  customer_name: string;
-  customer_email: string;
-  customer_phone: string;
-  shipping_address: string;
-  shipping_city: string;
-  shipping_postal_code: string;
-  shipping_country: string;
-  payment_method: string;
-  card_number?: string;
-  card_expiry?: string;
-  card_cvv?: string;
-  items: {
-    product_id: number;
-    quantity: number;
-  }[];
-}
-
-export interface QueueStatus {
-  status: 'active' | 'waiting';
-  position?: number;
-  queue_length?: number;
-  estimated_wait_seconds?: number;
-  active_users?: number;
-  max_users?: number;
-}
-
-export interface QueueStats {
-  active_users: number;
-  waiting_users: number;
-  max_concurrent_users: number;
-  queue_enabled: boolean;
-}
+// Re-export types for backward compatibility
+export type {
+  ApiError,
+  Product,
+  Order,
+  OrderItem,
+  CreateOrderData,
+  QueueStatus,
+  QueueStats,
+};
 
 /**
  * Get session ID from localStorage (client-side only)

@@ -6,7 +6,38 @@
  * while using the new fetch-based implementation
  */
 
+import type {
+  QueueStatus,
+  AdminUser,
+  AdminDashboard,
+  AdminStats,
+  HistoryData,
+  RedisInfo,
+  Product,
+  CartItem,
+  OrderItem,
+  Order,
+  CreateOrderData,
+  PaymentData,
+} from '@/types';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+// Re-export types for backward compatibility
+export type {
+  QueueStatus,
+  AdminUser,
+  AdminDashboard,
+  AdminStats,
+  HistoryData,
+  RedisInfo,
+  Product,
+  CartItem,
+  OrderItem,
+  Order,
+  CreateOrderData,
+  PaymentData,
+};
 
 /**
  * Native fetch wrapper with error handling
@@ -50,149 +81,6 @@ function buildUrl(path: string, params?: Record<string, any>): string {
 
   const queryString = searchParams.toString();
   return queryString ? `${url}?${queryString}` : url;
-}
-
-// ==================== Types ====================
-
-export interface QueueStatus {
-  status: 'active' | 'waiting';
-  position?: number;
-  queue_length?: number;
-  estimated_wait_seconds?: number;
-  active_users?: number;
-  max_users?: number;
-  message?: string;
-}
-
-export interface AdminUser {
-  session_id: string;
-  full_session_id: string;
-  joined_at: string;
-  ttl?: number;
-  expires_in?: string;
-  position?: number;
-  wait_time?: string;
-  estimated_wait?: string;
-}
-
-export interface AdminDashboard {
-  summary: {
-    active_users: number;
-    waiting_users: number;
-    total_users: number;
-    max_concurrent_users: number;
-    queue_enabled: boolean;
-    usage_percentage: number;
-    available_slots: number;
-    status: 'healthy' | 'moderate' | 'warning' | 'critical';
-  };
-  active_users: AdminUser[];
-  waiting_users: AdminUser[];
-  config: {
-    max_concurrent_users: number;
-    queue_enabled: boolean;
-    session_ttl: number;
-    bypass_token: string;
-  };
-}
-
-export interface AdminStats {
-  active_users: number;
-  waiting_users: number;
-  total_users: number;
-  max_concurrent_users: number;
-  queue_enabled: boolean;
-  usage_percentage: number;
-  available_slots: number;
-  status: string;
-  timestamp: number;
-}
-
-export interface HistoryData {
-  timestamp: number;
-  time: string;
-  active_users: number;
-  waiting_users: number;
-}
-
-export interface RedisInfo {
-  connected_clients: string;
-  used_memory_human: string;
-  used_memory_peak_human: string;
-  total_commands_processed: string;
-  uptime_in_seconds: number;
-  uptime_in_days: number;
-}
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  image: string | null;
-  category: string | null;
-  active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-}
-
-export interface OrderItem {
-  id: number;
-  product_id: number;
-  product_name: string;
-  product_price: number;
-  quantity: number;
-  subtotal: number;
-}
-
-export interface Order {
-  id: number;
-  order_number: string;
-  customer_name: string;
-  customer_email: string;
-  customer_phone: string;
-  shipping_address: string;
-  shipping_city: string;
-  shipping_postal_code: string;
-  shipping_country: string;
-  subtotal: number;
-  shipping_cost: number;
-  tax: number;
-  total: number;
-  payment_method: string;
-  payment_status: string;
-  order_status: string;
-  notes: string | null;
-  session_id: string | null;
-  items: OrderItem[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CreateOrderData {
-  customer_name: string;
-  customer_email: string;
-  customer_phone: string;
-  shipping_address: string;
-  shipping_city: string;
-  shipping_postal_code: string;
-  shipping_country: string;
-  payment_method: 'credit_card' | 'paypal' | 'bank_transfer';
-  items: { product_id: number; quantity: number }[];
-  notes?: string;
-}
-
-export interface PaymentData {
-  payment_method: string;
-  card_number?: string;
-  card_expiry?: string;
-  card_cvv?: string;
 }
 
 // ==================== Queue API ====================

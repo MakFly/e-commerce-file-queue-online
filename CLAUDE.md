@@ -245,16 +245,30 @@ estimatedWaitSeconds = (position * averageSessionDuration) / maxConcurrentUsers
 | MySQL | 8.0 | Base de données relationnelle |
 | Redis | 7.x | Cache et file d'attente |
 
-### Frontend
+### Frontend (Modernisé - 2025)
 
 | Technologie | Version | Rôle |
 |-------------|---------|------|
-| Next.js | 14.x | Framework React |
-| React | 18.x | Librairie UI |
-| TypeScript | 5.x | Typage statique |
-| Tailwind CSS | 3.x | Framework CSS |
-| Axios | 1.6.x | Client HTTP |
-| UUID | 9.x | Génération d'identifiants |
+| **Next.js** | **16.0** | Framework React avec App Router & **Turbopack** |
+| **React** | **19.0** | Librairie UI avec **React Compiler** |
+| **TypeScript** | **5.7** | Typage statique |
+| **Native Fetch API** | Built-in | Client HTTP (**NO external libraries**) |
+| **TanStack Query** | 5.62 | Data fetching & cache management |
+| **React Hook Form** | 7.54 | Gestion des formulaires performante |
+| **Zod** | 3.24 | Validation de schémas type-safe |
+| **shadcn/ui** | Latest | Composants UI avec Radix UI |
+| **Tailwind CSS** | 3.4 | Framework CSS utilitaire |
+| **Sonner** | 1.7 | Toast notifications |
+| **UUID** | 11.x | Génération d'identifiants |
+
+### Nouveautés 2025
+
+- ⚡ **Turbopack Stable** : Bundler 5-10x plus rapide que Webpack
+- 🚀 **React Compiler** : Optimisation automatique sans memo/useMemo
+- 🎯 **Native Fetch** : Aucune dépendance HTTP externe (axios supprimé)
+- 📦 **Type Aliases** : Utilisation exclusive de `type` au lieu d'`interface`
+- 🔄 **Server Actions** : Mutations côté serveur type-safe
+- 💾 **Cache Tags** : Invalidation granulaire avec Next.js 16
 
 ### DevOps
 
