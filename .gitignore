@@ -13,6 +13,23 @@
 /backend/storage/*.key
 /backend/.phpunit.cache
 
+# Laravel backend (new structure)
+/backend-laravel/vendor/
+/backend-laravel/.env
+/backend-laravel/.env.backup
+/backend-laravel/storage/logs/*.log
+/backend-laravel/.phpunit.result.cache
+/backend-laravel/.phpunit.cache
+
+# Symfony backend
+/backend-symfony/vendor/
+/backend-symfony/.env
+/backend-symfony/.env.local
+/backend-symfony/.env.*.local
+/backend-symfony/var/log/*.log
+/backend-symfony/var/cache/
+/backend-symfony/.phpunit.result.cache
+
 # Next.js v16 frontend
 /frontend-nextjs-v16/node_modules/
 /frontend-nextjs-v16/.next/
@@ -42,3 +59,5 @@
 *.swp
 *.swo
 *~
+config.bat
+node_modules
